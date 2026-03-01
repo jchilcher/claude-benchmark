@@ -7,6 +7,7 @@ from actual task/profile loading and benchmark execution.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -17,8 +18,14 @@ from typer.testing import CliRunner
 from claude_benchmark.cli.main import app
 from claude_benchmark.cli.commands.run import _TaskProxy, _ProfileProxy, _write_manifest
 
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
 runner = CliRunner()
+
+
+def _plain(text: str) -> str:
+    """Strip ANSI escape codes from Rich/Typer output."""
+    return _ANSI_RE.sub("", text)
 
 
 # ---------------------------------------------------------------------------
@@ -64,39 +71,39 @@ class TestRunHelp:
     def test_help_shows_concurrency_flag(self):
         result = runner.invoke(app, ["run", "--help"])
         assert result.exit_code == 0
-        assert "--concurrency" in result.output
+        assert "--concurrency" in _plain(result.output)
 
     def test_help_shows_max_cost_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--max-cost" in result.output
+        assert "--max-cost" in _plain(result.output)
 
     def test_help_shows_task_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--task" in result.output
+        assert "--task" in _plain(result.output)
 
     def test_help_shows_profile_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--profile" in result.output
+        assert "--profile" in _plain(result.output)
 
     def test_help_shows_model_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--model" in result.output
+        assert "--model" in _plain(result.output)
 
     def test_help_shows_reps_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--reps" in result.output
+        assert "--reps" in _plain(result.output)
 
     def test_help_shows_results_dir_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--results-dir" in result.output
+        assert "--results-dir" in _plain(result.output)
 
     def test_help_shows_yes_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--yes" in result.output
+        assert "--yes" in _plain(result.output)
 
     def test_help_shows_dry_run_flag(self):
         result = runner.invoke(app, ["run", "--help"])
-        assert "--dry-run" in result.output
+        assert "--dry-run" in _plain(result.output)
 
 
 # ---------------------------------------------------------------------------

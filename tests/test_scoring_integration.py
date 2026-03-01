@@ -501,6 +501,8 @@ class TestScoringProgressCallbackCalled:
 class TestCLIFlagsExist:
     """Tests that scoring CLI flags are present on the run command."""
 
+    _ANSI_RE = __import__("re").compile(r"\x1b\[[0-9;]*m")
+
     def test_cli_flags_exist(self) -> None:
         """--skip-llm-judge and --strict-scoring are valid CLI options."""
         from typer.testing import CliRunner
@@ -509,7 +511,8 @@ class TestCLIFlagsExist:
 
         runner = CliRunner()
         result = runner.invoke(app, ["run", "--help"])
+        output = self._ANSI_RE.sub("", result.output)
 
         assert result.exit_code == 0
-        assert "--skip-llm-judge" in result.output
-        assert "--strict-scoring" in result.output
+        assert "--skip-llm-judge" in output
+        assert "--strict-scoring" in output
